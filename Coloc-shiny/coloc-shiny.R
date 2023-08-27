@@ -100,19 +100,23 @@ server <- function(input, output, session) {
     eqtl <- eqtl()
     
     
-    input_data <- merge(eqtl, gwas, by="rs_id", all=FALSE, suffixes=c("_eqtl","_gwas"))
-    colnames(input_data)[1] = 'snp'
-    
-    result <- coloc.abf(dataset1=list(pvalues=input_data$pval_nominal_gwas, type="cc", s=0.33, N=50000,snp = input_data$snp), 
-                        dataset2=list(pvalues=input_data$pval_nominal_eqtl, type="quant", N=10000,snp=input_data$snp), 
-                        MAF=input_data$maf)
-    condition = as.numeric(input$prob)
-    need_result = result$results
-    need_result$SNP.PP.H4 = as.numeric(need_result$SNP.PP.H4)
-    print(class(need_result$SNP.PP.H4))
-    need_result = subset(need_result,need_result$SNP.PP.H4 > condition)
-    need_result <<- need_result[,c(1,2,9,16,17)]
-    
+    if(is.null(gwas) | is.null(eqtl)){
+      warning("Please upload files!")
+    } 
+    else{
+      input_data <- merge(eqtl, gwas, by="rs_id", all=FALSE, suffixes=c("_eqtl","_gwas"))
+      colnames(input_data)[1] = 'snp'
+      
+      result <- coloc.abf(dataset1=list(pvalues=input_data$pval_nominal_gwas, type="cc", s=0.33, N=50000,snp = input_data$snp), 
+                          dataset2=list(pvalues=input_data$pval_nominal_eqtl, type="quant", N=10000,snp=input_data$snp), 
+                          MAF=input_data$maf)
+      condition = as.numeric(input$prob)
+      need_result = result$results
+      need_result$SNP.PP.H4 = as.numeric(need_result$SNP.PP.H4)
+      print(class(need_result$SNP.PP.H4))
+      need_result = subset(need_result,need_result$SNP.PP.H4 > condition)
+      need_result <<- need_result[,c(1,2,9,16,17)]
+    }
   }, options = list(pageLength = 10))
   
   output$downloadData <- downloadHandler(
@@ -123,8 +127,6 @@ server <- function(input, output, session) {
       write.csv(need_result,file,row.names = T,quote = F)
     }
   )
-  
-  
 }
 
 # Run the application 
