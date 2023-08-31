@@ -25,7 +25,7 @@ ui <- tagList(
         h6('https://github.com/hzaurzli (Small runze)'),
         br(),
         h5('Cition:'),
-        h6('Identifying phenotype-associated subpopulations by integrating bulk and single-cell sequencing data')
+        h6('https://github.com/chr1swallace/coloc')
       ),
       mainPanel(
         h4("Coloc table"),
